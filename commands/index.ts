@@ -6,7 +6,7 @@ interface CommandMap {
     [ key: string ]: Command;
 }
 
-module.exports = function commandLoader( program: CommanderStatic ) {
+export default function commandLoader( program: CommanderStatic ) {
 	'use strict';
 
 	let commands: CommandMap = {};
@@ -15,7 +15,7 @@ module.exports = function commandLoader( program: CommanderStatic ) {
 	// Loop though command files
 	fs.readdirSync( loadPath ).filter( function ( filename ) {
 		return ( /\.js$/.test( filename ) && filename !== 'index.js' );
-	}).forEach( function ( filename ) {
+	} ).forEach( function ( filename ) {
 		let name: string = filename.substr( 0, filename.lastIndexOf( '.' ) );
 
 		// Require command
