@@ -1,40 +1,34 @@
-import { existsSync, readFileSync, statSync, writeFileSync } from 'fs';
-
 interface Dictionary {
-    [ key: string ]: any;
+    [key: string]: any;
 }
 
-export default class KeyValueStore {
+class KeyValueStore {
 
     private _keyed_values: Dictionary;
 
-    constructor( data: Dictionary ) {
+    constructor(data: Dictionary) {
         this._keyed_values = data;
     }
 
-    get( key: string ): any {
-        return this._keyed_values[ key ];
+    get(key: string): any {
+        return this._keyed_values[key];
     }
 
-    set( key: string, value: any ): void {
-        this._keyed_values[ key ] = value;
+    getKeys(): string[] {
+        return Object.keys(this._keyed_values);
     }
 
-    toString() {
-        return JSON.stringify( this._keyed_values );
+    set(key: string, value: any): void {
+        this._keyed_values[key] = value;
     }
 
-    static loadFromFile( filePath: string ) {
-        if ( !existsSync( filePath ) || !statSync( filePath ).isFile() ) {
-            throw Error( 'Invalid file path specified: ' + filePath );
-        }
-
-        let content: string = readFileSync( filePath ).toString();
-        let data = JSON.parse( content );
-        return new KeyValueStore( data );
+    delete(key: string): void {
+        delete this._keyed_values[key];
     }
 
-    static saveToFile( filePath: string, valueStore: KeyValueStore ) {
-        writeFileSync( filePath, valueStore.toString() );
+    toString(): string {
+        return JSON.stringify(this._keyed_values);
     }
 }
+
+export {Dictionary, KeyValueStore};

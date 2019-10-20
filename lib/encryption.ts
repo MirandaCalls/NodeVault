@@ -1,46 +1,45 @@
-import crypto, { Decipher, Cipher, Hmac } from 'crypto';
+import crypto, {Decipher, Cipher, Hmac, randomBytes} from 'crypto';
 
 const ALGORITHM = 'aes-192-cbc';
 
-function decipher( passphrase: string, encryptedText: string ): string {
-    const key: Buffer = crypto.scryptSync( passphrase, 'salt', 24 );
-    const iv: Buffer = Buffer.alloc( 16, 0 );
+function randomString() {
+    return randomBytes(20).toString('hex');
+}
 
-    const decipher: Decipher = crypto.createDecipheriv( ALGORITHM, key, iv );
+function decipher(passkey: string, encryptedText: string): string {
+    const key: Buffer = crypto.scryptSync(passkey, 'salt', 24);
+    const iv: Buffer = Buffer.alloc(16, 0);
 
-    let decrypted: string = decipher.update( encryptedText, 'hex', 'utf8' );
-    decrypted += decipher.final( 'utf8' );
+    const decipher: Decipher = crypto.createDecipheriv(ALGORITHM, key, iv);
+
+    let decrypted: string = decipher.update(encryptedText, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
 
     return decrypted;
 }
 
-function encrypt( passphrase: string, content: string ): string {
-    const key: Buffer = crypto.scryptSync( passphrase, 'salt', 24 );
-    const iv: Buffer = Buffer.alloc( 16, 0 );
+function encrypt(passkey: string, content: string): string {
+    const key: Buffer = crypto.scryptSync(passkey, 'salt', 24);
+    const iv: Buffer = Buffer.alloc(16, 0);
 
-    const cipher: Cipher = crypto.createCipheriv( ALGORITHM, key, iv );
+    const cipher: Cipher = crypto.createCipheriv(ALGORITHM, key, iv);
 
-    let encrypted: string = cipher.update( content, 'utf8', 'hex' );
-    encrypted += cipher.final( 'hex' );
-    
+    let encrypted: string = cipher.update(content, 'utf8', 'hex');
+    encrypted += cipher.final('hex');
+
     return encrypted;
 }
 
-function hashPassphrase( content: string, secret: string ): string {
-    const hash: Hmac = crypto.createHmac( 'sha256', secret );
-    hash.update( content );
-    return hash.digest( 'hex' );
+function hashPasskey(content: string, secret: string): string {
+    const hash: Hmac = crypto.createHmac('sha256', secret);
+    hash.update(content);
+    return hash.digest('hex');
 }
 
-function checkHash( content: string, passphraseHash: string, secret: string ): boolean {
-    const hash: Hmac = crypto.createHmac( 'sha256', secret );
-    hash.update( content );
-    return passphraseHash === hash.digest( 'hex' );
+function checkHash(content: string, passkeyHash: string, secret: string): boolean {
+    const hash: Hmac = crypto.createHmac('sha256', secret);
+    hash.update(content);
+    return passkeyHash === hash.digest('hex');
 }
 
-module.exports = {
-    decipher: decipher,
-    encrypt: encrypt,
-    hashPassphrase: hashPassphrase,
-    checkHash: checkHash
-}
+export {randomString, decipher, encrypt, hashPasskey, checkHash};
